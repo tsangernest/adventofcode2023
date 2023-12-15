@@ -14,10 +14,12 @@ import re
 pp = PrettyPrinter(indent=2, width=1)
 
 
-nums: str = "one|two|three|four|five|six|seven|eight|nine"
+nums: list[str] = [
+    "zero", "one", "two", "three",
+    "four", "five", "six", "seven",
+    "eight", "nine",
+]
 nums_re: Pattern = re.compile(r"(?=(\d|%s))" % nums)
-nums: list = nums.split("|")
-
 
 
 
