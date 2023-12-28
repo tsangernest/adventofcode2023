@@ -13,9 +13,7 @@ def get_file_data():
         encoding="utf-8",
     )
 
-
-    for line in f:
-        print(line)
+    striped: list = [line.strip() for line in f]
 
 
 def main() -> None:
