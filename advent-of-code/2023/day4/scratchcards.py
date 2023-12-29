@@ -1,9 +1,11 @@
+import math
+import sys
+import re
+
 from dataclasses import (
     dataclass,
     field,
 )
-import sys
-import re
 
 import pprint
 pp = pprint.PrettyPrinter(indent=2, width=1)
@@ -17,6 +19,38 @@ class Card:
     numbers_to_match: list = field(default_factory=list)
 
     number_of_matches: int = field(default=0)
+    score: int = field(default=0)
+
+
+def get_card_pile_score(data: list[Card]) -> int:
+    pile_score: int = 0
+
+    for card in data:
+        pile_score += card.score
+
+    return pile_score
+
+
+def calculate_card_score(data: list[Card]) -> None:
+    for card in data:
+        score: int = 0
+
+        if card.number_of_matches == 0:
+            continue
+        if card.number_of_matches == 1:
+            card.score = 1
+        if card.number_of_matches > 1:
+            card.score = math.pow(2, card.number_of_matches - 1)
+
+
+def get_matches(data: list[Card]) -> None:
+    for card in data:
+
+        collisions: int = 0
+        for curr in card.winning_numbers:
+            if curr in card.numbers_to_match:
+                collisions += 1
+            card.number_of_matches = collisions
 
 
 def get_numbers_to_match(data: str) -> list:
@@ -36,7 +70,7 @@ def get_winning_nums(data: str) -> list:
 def get_card_id(data: str) -> int:
     card_id: int = int(
         re
-        .search(pattern=r"\w+ (\d+)", string=data)
+        .search(pattern=r"(\d+)$", string=data)
         .group(1)
     )
 
@@ -54,9 +88,9 @@ def get_input_data() -> list:
 
             card_section = data.split(sep=":", maxsplit=1)
 
-            card_id: int = get_card_id(data=card_section[0])
-            win_nums: list = get_winning_nums(data=card_section[1])
-            nums: list = get_numbers_to_match(data=card_section[1])
+            card_id: int = get_card_id(data=card_section[0].strip())
+            win_nums: list = get_winning_nums(data=card_section[1].strip())
+            nums: list = get_numbers_to_match(data=card_section[1].strip())
 
             all_cards.append(
                 Card(card_id=card_id,
@@ -70,8 +104,12 @@ def get_input_data() -> list:
         return all_cards
 
 
+# Bizniss logic
 def main() -> None:
     card_data: list[Card] = get_input_data()
+    get_matches(data=card_data)
+    calculate_card_score(data=card_data)
+    pile_score: int = get_card_pile_score(data=card_data)
 
     print(f"\n\n***THE END***\n\n")
     sys.exit(1)
